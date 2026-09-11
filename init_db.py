@@ -14,9 +14,9 @@ from config import Config
 def init_mysql_db():
     try:
         import socket
-        # Fast socket check to avoid long OS TCP timeout
+        # Fast socket check — use a longer timeout for non-standard ports (e.g. Filess.io uses 61001)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.5)
+        sock.settimeout(5)
         check_result = sock.connect_ex((Config.MYSQL_HOST, Config.MYSQL_PORT))
         sock.close()
         if check_result != 0:
@@ -28,32 +28,20 @@ def init_mysql_db():
 
         print("-> Connecting to MySQL Server at {}:{}...".format(Config.MYSQL_HOST, Config.MYSQL_PORT))
 
-        # Cloud MySQL (Filess.io, Aiven, etc.) pre-creates the database — connect to it directly.
-        # For local MySQL, try connecting without DB first to run CREATE DATABASE.
-        try:
-            cnx = mysql.connector.connect(
-                host=Config.MYSQL_HOST,
-                user=Config.MYSQL_USER,
-                password=Config.MYSQL_PASSWORD,
-                database=Config.MYSQL_DB,
-                port=Config.MYSQL_PORT,
-                connection_timeout=5
-            )
-            cursor = cnx.cursor()
-            print("-> Connected directly to database '{}'.".format(Config.MYSQL_DB))
-        except mysql.connector.errors.ProgrammingError:
-            # Database doesn't exist yet — try creating it (local MySQL)
-            cnx = mysql.connector.connect(
-                host=Config.MYSQL_HOST,
-                user=Config.MYSQL_USER,
-                password=Config.MYSQL_PASSWORD,
-                port=Config.MYSQL_PORT,
-                connection_timeout=5
-            )
-            cursor = cnx.cursor()
-            cursor.execute("CREATE DATABASE IF NOT EXISTS {} DEFAULT CHARACTER SET 'utf8mb4'".format(Config.MYSQL_DB))
-            cursor.execute("USE {}".format(Config.MYSQL_DB))
-            print("-> Database '{}' created and selected.".format(Config.MYSQL_DB))
+        # Always connect directly to MYSQL_DB.
+        # Cloud providers (Filess.io, Aiven, Clever Cloud) pre-create the database —
+        # the DB name is provided by the provider (e.g. school_lost_found_splitpoor).
+        # For local MySQL, ensure MYSQL_DB matches your local database name.
+        cnx = mysql.connector.connect(
+            host=Config.MYSQL_HOST,
+            user=Config.MYSQL_USER,
+            password=Config.MYSQL_PASSWORD,
+            database=Config.MYSQL_DB,
+            port=Config.MYSQL_PORT,
+            connection_timeout=10
+        )
+        cursor = cnx.cursor()
+        print("-> Connected to database '{}'.".format(Config.MYSQL_DB))
 
         # Step 2: Create Tables
         tables = {}
