@@ -82,7 +82,7 @@ If you prefer to configure the service manually in the Render dashboard:
    - `SECRET_KEY`: `your-random-production-secret-key`
    - `DB_MODE`: `auto`
    - `FLASK_DEBUG`: `False`
-5. Click **Create Web Service**. Your portal will be live in 2-3 minutes at `https://school-lost-found-xxxx.onrender.com`!
+5. Click **Create Web Service**. Your portal is live at `https://school-lost-and-found-vboh.onrender.com`!
 
 ---
 

@@ -99,8 +99,7 @@ INSERT INTO items (item_id, item_name, category, description, color, location, d
 (6, 'Mathematics Classmate Notebook', 'Books', '200 pages spiral notebook with Class 12 Calculus handwritten notes.', 'Brown', 'Room 204 Senior Block', '2026-09-06', 'FOUND', 'OPEN', 2),
 (7, 'Black Wildcraft Backpack', 'Accessories', 'Wildcraft double compartment bag containing biology textbook and pencil pouch.', 'Black', 'School Canteen Hall', '2026-09-07', 'FOUND', 'CLAIMED', 3),
 (8, 'Camlin Geometry Box', 'Stationery', 'Metal tin geometry box containing compass, divider and set squares.', 'Silver', 'Room 102 Junior Wing', '2026-09-08', 'LOST', 'OPEN', 5),
-(9, 'Senior School Uniform Tie', 'Clothing', 'Maroon and gold striped standard school tie with school crest clip.', 'Maroon', 'Morning Assembly Ground', '2026-09-08', 'FOUND', 'OPEN', 4),
-(10, 'Silver Digital Wristwatch', 'Accessories', 'Fastrack silver chain wristwatch with blue dial face.', 'Silver', 'Basketball Court Bleachers', '2026-09-01', 'LOST', 'RETURNED', 2);
+(9, 'Senior School Uniform Tie', 'Clothing', 'Maroon and gold striped standard school tie with school crest clip.', 'Maroon', 'Morning Assembly Ground', '2026-09-08', 'FOUND', 'OPEN', 4);
 
 -- Insert Sample Claims
 INSERT INTO claims (claim_id, item_id, user_id, reason, lost_location, additional_info, status) VALUES

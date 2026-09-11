@@ -802,6 +802,29 @@ def my_reports():
 
     return render_template('my_reports.html', reports=reports, current_filter=status_filter)
 
+@app.route('/item/<int:item_id>/mark-found', methods=['POST'])
+@login_required
+def mark_item_found(item_id):
+    """
+    Allows a student (or administrator) to mark a lost item as found,
+    removing its active record from the table to keep the catalog clean.
+    """
+    item = execute_query("SELECT * FROM items WHERE item_id = %s", (item_id,), fetchone=True)
+    if not item:
+        abort(404)
+
+    is_owner = (item['reported_by'] == session['user_id'])
+    is_admin = (session.get('role') == 'admin')
+
+    if not (is_owner or is_admin):
+        flash("You do not have permission to modify this report.", "danger")
+        return redirect(url_for('my_reports'))
+
+    # Delete the resolved lost item from the table
+    execute_query("DELETE FROM items WHERE item_id = %s", (item_id,), commit=True)
+    flash("Lost item '{}' has been marked as found and removed from the active table.".format(item['item_name']), "success")
+    return redirect(request.referrer or url_for('my_reports'))
+
 @app.route('/my-claims')
 @login_required
 def my_claims():

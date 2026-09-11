@@ -118,6 +118,21 @@
             {% endif %}
         {% endif %}
 
+        <!-- Lost Item Owner Action: Mark as Found / Remove -->
+        {% if item.item_type == 'LOST' and (is_owner or is_admin) %}
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 18px; margin-top: 20px;">
+                <h4 style="color: #34d399; font-size: 1rem; margin-bottom: 6px;">🎉 Did you find this item?</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                    If this lost item was recovered or returned to you, click below to remove it from the active lost-and-found table.
+                </p>
+                <form method="POST" action="{{ url_for('mark_item_found', item_id=item.item_id) }}">
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Confirm that this lost item is found and should be removed from the table?');">
+                        ✓ Mark as Found &amp; Remove from Table
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
         <!-- Admin Quick Actions (If logged in as Admin) -->
         {% if is_admin %}
             <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-glass);">

@@ -3,6 +3,8 @@
 **Class 12 CBSE Computer Science (Subject Code: 083) Practical Examination Project**  
 *Academic Year: 2025–2026*
 
+🌐 **Live Deployed Web Portal:** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
+
 ---
 
 ## 📋 Table of Contents
@@ -234,13 +236,14 @@ http://127.0.0.1:5000
 
 ## 9. Cloud Deployment (Render & Firebase Hosting)
 
-The application is pre-configured for instant zero-configuration deployment to both **Render** and **Firebase Hosting**:
+The application is deployed live and pre-configured for instant zero-configuration hosting:
 
-- **Render Hosting:** Native Python web service via [`render.yaml`](file:///d:/CS%20holiday%20homework/school-lost-found/render.yaml) & [`Procfile`](file:///d:/CS%20holiday%20homework/school-lost-found/Procfile) with Gunicorn WSGI server.
-- **Firebase Hosting:** Global CDN deployment via [`firebase.json`](file:///d:/CS%20holiday%20homework/school-lost-found/firebase.json), [`.firebaserc`](file:///d:/CS%20holiday%20homework/school-lost-found/.firebaserc), and [`Dockerfile`](file:///d:/CS%20holiday%20homework/school-lost-found/Dockerfile).
+- **Live Web Service (Render):** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
+- **Render Hosting Configuration:** Native Python web service via [`render.yaml`](render.yaml) & [`Procfile`](Procfile) with Gunicorn WSGI server.
+- **Firebase Hosting:** Global CDN deployment via [`firebase.json`](firebase.json), [`.firebaserc`](.firebaserc), and [`Dockerfile`](Dockerfile).
 - **Dual Database Engine:** Automatically runs in MySQL 8.0 mode when MySQL is available, and falls back to SQLite in cloud environments with zero crashes.
 
-📖 **For complete copy-paste instructions, see the dedicated [Deployment Guide](file:///d:/CS%20holiday%20homework/school-lost-found/DEPLOYMENT.md).**
+📖 **For complete copy-paste instructions, see the dedicated [Deployment Guide](DEPLOYMENT.md).**
 
 ---
 

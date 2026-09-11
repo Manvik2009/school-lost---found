@@ -49,7 +49,16 @@
                             <td>{{ item.date_reported }}</td>
                             <td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td>
                             <td>
-                                <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm">View</a>
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm">View</a>
+                                    {% if item.item_type == 'LOST' %}
+                                        <form method="POST" action="{{ url_for('mark_item_found', item_id=item.item_id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-success btn-sm" title="Mark this item as found and remove it from the table" onclick="return confirm('Did you find this item? It will be removed from the school lost and found table.');">
+                                                ✓ Found (Remove)
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

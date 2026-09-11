@@ -135,7 +135,6 @@ def init_mysql_db():
                 ('Black Wildcraft Backpack', 'Accessories', 'Double compartment bag with textbooks inside.', 'Black', 'School Canteen Hall', '2026-09-07', 'FOUND', 'CLAIMED', 3),
                 ('Camlin Geometry Box', 'Stationery', 'Metal tin geometry box containing compass and divider.', 'Silver', 'Room 102 Junior Wing', '2026-09-08', 'LOST', 'OPEN', 5),
                 ('Senior School Uniform Tie', 'Clothing', 'Maroon and gold striped standard school tie.', 'Maroon', 'Morning Assembly Ground', '2026-09-08', 'FOUND', 'OPEN', 4),
-                ('Silver Digital Wristwatch', 'Accessories', 'Fastrack silver chain wristwatch with blue dial.', 'Silver', 'Basketball Court Bleachers', '2026-09-01', 'LOST', 'RETURNED', 2),
             ]
             item_insert = """
             INSERT INTO items (item_name, category, description, color, location, date_reported, item_type, status, reported_by)
@@ -294,7 +293,6 @@ def init_sqlite_db(db_path=None):
             ('Black Wildcraft Backpack', 'Accessories', 'Double compartment bag with textbooks inside.', 'Black', 'School Canteen Hall', '2026-09-07', 'FOUND', 'CLAIMED', 3),
             ('Camlin Geometry Box', 'Stationery', 'Metal tin geometry box containing compass and divider.', 'Silver', 'Room 102 Junior Wing', '2026-09-08', 'LOST', 'OPEN', 5),
             ('Senior School Uniform Tie', 'Clothing', 'Maroon and gold striped standard school tie.', 'Maroon', 'Morning Assembly Ground', '2026-09-08', 'FOUND', 'OPEN', 4),
-            ('Silver Digital Wristwatch', 'Accessories', 'Fastrack silver chain wristwatch with blue dial.', 'Silver', 'Basketball Court Bleachers', '2026-09-01', 'LOST', 'RETURNED', 2),
         ]
         cursor.executemany("""
         INSERT INTO items (item_name, category, description, color, location, date_reported, item_type, status, reported_by)
