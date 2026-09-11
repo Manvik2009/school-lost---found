@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.item_name }} - Item Details{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('search') }}" style="font-size: 0.88rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
+        &larr; Back to Search Catalog
+    </a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start;">
+    <!-- Main Item Details Card -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <span class="badge badge-{{ item.item_type|lower }}">{{ item.item_type }}</span>
+                <span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-dim);">
+                Item #{{ item.item_id }}
+            </div>
+        </div>
+
+        <h1 style="font-size: 1.85rem; margin-bottom: 12px;">{{ item.item_name }}</h1>
+
+        <div class="item-meta" style="border-top: none; padding-top: 0; margin-bottom: 24px;">
+            <div class="item-meta-row">
+                <span class="meta-label">Category:</span>
+                <span class="meta-value">{{ item.category }}</span>
+            </div>
+            <div class="item-meta-row">
+                <span class="meta-label">Primary Color:</span>
+                <span class="meta-value">{{ item.color or 'Not specified' }}</span>
+            </div>
+            <div class="item-meta-row">
+                <span class="meta-label">Reported Location:</span>
+                <span class="meta-value">{{ item.location }}</span>
+            </div>
+            <div class="item-meta-row">
+                <span class="meta-label">Date of Incident:</span>
+                <span class="meta-value">{{ item.date_reported }}</span>
+            </div>
+            <div class="item-meta-row">
+                <span class="meta-label">Reported By:</span>
+                <span class="meta-value">
+                    {% if is_owner or is_admin %}
+                        {{ item.reporter_name }} ({{ item.reporter_student_id }})
+                    {% else %}
+                        Registered Student (Verified ID)
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Description &amp; Identifying Details</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+            {{ item.description or 'No additional description provided by reporter.' }}
+        </p>
+
+        <!-- Claim Action Section (For OPEN FOUND Items) -->
+        {% if item.item_type == 'FOUND' %}
+            {% if item.status == 'OPEN' %}
+                {% if session.get('user_id') %}
+                    {% if is_owner %}
+                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-sm); padding: 14px; font-size: 0.88rem; color: #93c5fd;">
+                            ℹ️ You reported this found item. If a student claims it, school administration will verify their claim.
+                        </div>
+                    {% elif user_has_claimed %}
+                        <div style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: var(--radius-sm); padding: 14px;">
+                            <h4 style="color: #c084fc; font-size: 0.95rem; margin-bottom: 4px;">Claim Submitted ({{ existing_claim.status }})</h4>
+                            <p style="font-size: 0.82rem; color: var(--text-muted);">
+                                You submitted a claim for this item on {{ existing_claim.created_at }}. Check <a href="{{ url_for('my_claims') }}">My Claims</a> for updates.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 8px; color: var(--accent-cyan);">Does this item belong to you?</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                                Submit a verification claim explaining identifying marks and where you lost it. School staff will review your claim before handover.
+                            </p>
+
+                            <!-- Inline Claim Form -->
+                            <form method="POST" action="{{ url_for('claim_item', item_id=item.item_id) }}" data-validate="true" style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+                                <div class="form-group">
+                                    <label for="reason">Why do you believe this item belongs to you? *</label>
+                                    <input type="text" id="reason" name="reason" class="form-control" placeholder="e.g. My initials are marked on the back cover" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="lost_location">Where did you lose it? *</label>
+                                    <input type="text" id="lost_location" name="lost_location" class="form-control" placeholder="e.g. Physics Lab 3rd period desk" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="additional_info">Additional Identifying Information</label>
+                                    <textarea id="additional_info" name="additional_info" class="form-control" style="min-height: 80px;" placeholder="Unique scratches, stickers, contents, or serial numbers to verify you are the genuine owner..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Verification Claim</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div style="border-top: 1px solid var(--border-glass); padding-top: 18px; text-align: center;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Does this item belong to you?</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary">Log In to Submit Claim</a>
+                    </div>
+                {% endif %}
+            {% elif item.status == 'CLAIMED' %}
+                <div style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: var(--radius-sm); padding: 14px; color: #c084fc; font-size: 0.9rem;">
+                    🔒 This item has been verified and claimed. Pending physical handover to rightful owner.
+                </div>
+            {% elif item.status == 'RETURNED' %}
+                <div style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: var(--radius-sm); padding: 14px; color: #38bdf8; font-size: 0.9rem;">
+                    ✨ This item was successfully returned to its rightful owner.
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- Admin Quick Actions (If logged in as Admin) -->
+        {% if is_admin %}
+            <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-glass);">
+                <div style="font-size: 0.8rem; text-transform: uppercase; color: #c084fc; font-weight: 700; margin-bottom: 10px;">
+                    🛡️ Administrator Actions:
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    {% if item.status == 'PENDING' %}
+                        <form method="POST" action="{{ url_for('admin_approve_item', item_id=item.item_id) }}">
+                            <button type="submit" class="btn btn-success btn-sm">Approve to OPEN</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin_reject_item', item_id=item.item_id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Reject Report</button>
+                        </form>
+                    {% endif %}
+                    {% if item.status in ('OPEN', 'CLAIMED') %}
+                        <form method="POST" action="{{ url_for('admin_mark_returned', item_id=item.item_id) }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Mark RETURNED</button>
+                        </form>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('admin_delete_item', item_id=item.item_id) }}">
+                        <button type="submit" class="btn btn-danger btn-sm" data-confirm="Are you sure you want to permanently delete this item report?" data-action-type="danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar: Possible Matches & Match Explanations -->
+    <div>
+        <div class="card">
+            <h3 style="font-size: 1.15rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                <span>🎯</span> Possible Matches ({{ matches|length }})
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+                Calculated by our 100-point algorithm across active reports.
+            </p>
+
+            {% if matches %}
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    {% for m in matches %}
+                        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 14px; transition: var(--transition);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span class="badge badge-{{ m.item_type|lower }}">{{ m.item_type }}</span>
+                                <span class="badge" style="background: var(--accent-gradient); color: white;">{{ m.match_score }}% Match</span>
+                            </div>
+                            <h4 style="font-size: 0.95rem; margin-bottom: 4px; color: #fff;">{{ m.item_name }}</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 8px;">Location: {{ m.location }}</p>
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+                                {% for r in m.match_breakdown.reasons %}
+                                    <span style="font-size: 0.7rem; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; color: var(--text-muted);">
+                                        ✓ {{ r }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+
+                            <a href="{{ url_for('item_details', item_id=m.item_id) }}" class="btn btn-outline btn-sm" style="width: 100%;">Inspect Match</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 20px 10px; color: var(--text-dim); font-size: 0.85rem;">
+                    No potential matches identified yet. As new reports are submitted, they will automatically appear here.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Algorithm Viva Explanation Info Box -->
+        <div class="card" style="margin-top: 20px; background: rgba(8, 12, 22, 0.5); border-style: dashed;">
+            <h4 style="font-size: 0.95rem; margin-bottom: 6px; color: var(--accent-cyan);">💡 CBSE Algorithm Scoring</h4>
+            <ul style="font-size: 0.78rem; color: var(--text-muted); list-style: none; display: flex; flex-direction: column; gap: 4px;">
+                <li>• <strong>Name Similarity:</strong> 40 Points max</li>
+                <li>• <strong>Category Match:</strong> 25 Points</li>
+                <li>• <strong>Color Match:</strong> 20 Points</li>
+                <li>• <strong>Location Proximity:</strong> 15 Points</li>
+                <li>• <strong>Total Maximum:</strong> 100 Points</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

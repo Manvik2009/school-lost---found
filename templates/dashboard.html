@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Student Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div style="margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Welcome back, {{ session.get('name') }}! 👋</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Student ID: <span style="color: var(--accent-cyan); font-weight: 600;">{{ session.get('student_id') }}</span> | Status: <span class="badge badge-open" style="font-size: 0.7rem;">Active Student</span>
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('report_lost') }}" class="btn btn-primary btn-sm">+ Report Lost</a>
+        <a href="{{ url_for('report_found') }}" class="btn btn-outline btn-sm">+ Report Found</a>
+    </div>
+</div>
+
+<!-- Personal Activity Counters -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon rose">🔍</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ my_lost }}</div>
+            <div class="stat-label">My Lost Reports</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon emerald">📦</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ my_found }}</div>
+            <div class="stat-label">My Found Reports</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">📑</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ my_claims }}</div>
+            <div class="stat-label">My Active Claims</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon cyan">🤝</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ my_returned }}</div>
+            <div class="stat-label">My Returned Belongings</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Cards Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 36px;">
+    <div class="card" style="border-left: 4px solid var(--type-lost);">
+        <h3 style="font-size: 1.15rem; margin-bottom: 8px;">📢 Misplaced an Item?</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Submit a lost item report immediately so school staff and fellow classmates can help you track it.
+        </p>
+        <a href="{{ url_for('report_lost') }}" class="btn btn-outline btn-sm" style="width: 100%;">Report Lost Item &rarr;</a>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--type-found);">
+        <h3 style="font-size: 1.15rem; margin-bottom: 8px;">📦 Found Someone's Belonging?</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Log found items such as calculators, ID cards, or notebooks to connect with the rightful student owner.
+        </p>
+        <a href="{{ url_for('report_found') }}" class="btn btn-outline btn-sm" style="width: 100%;">Report Found Item &rarr;</a>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-cyan);">
+        <h3 style="font-size: 1.15rem; margin-bottom: 8px;">🔍 Search All School Records</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Filter items by category, room location, color, or keyword with real-time database queries.
+        </p>
+        <a href="{{ url_for('search') }}" class="btn btn-outline btn-sm" style="width: 100%;">Search Catalog &rarr;</a>
+    </div>
+</div>
+
+<!-- Intelligent Lost <-> Found Match Recommendations (Key Impressive Feature) -->
+{% if suggestions %}
+    <div style="margin-bottom: 36px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
+            <div style="font-size: 1.4rem;">🎯</div>
+            <div>
+                <h2 style="font-size: 1.35rem;">Possible Matches for Your Lost Items</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Our matching algorithm detected potential found items that match your reports.
+                </p>
+            </div>
+        </div>
+
+        {% for sug in suggestions %}
+            <div class="match-card">
+                <div class="match-header">
+                    <div>
+                        <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--type-lost); font-weight: 700;">YOUR LOST REPORT:</span>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin-top: 2px;">{{ sug.lost_item.item_name }}</h3>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Category: {{ sug.lost_item.category }} | Color: {{ sug.lost_item.color or 'N/A' }} | Lost at: {{ sug.lost_item.location }}</p>
+                    </div>
+                    <div class="match-score-badge">
+                        {{ sug.best_match.match_score }}% Match
+                    </div>
+                </div>
+
+                <div class="match-progress-bar">
+                    <div class="match-progress-fill" style="width: {{ sug.best_match.match_score }}%;"></div>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.25); border-radius: var(--radius-sm); padding: 14px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--type-found); font-weight: 700; text-transform: uppercase;">MATCHING FOUND ITEM:</div>
+                        <h4 style="font-size: 1rem; color: #fff;">{{ sug.best_match.item_name }}</h4>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Found at: {{ sug.best_match.location }} | Found on: {{ sug.best_match.date_reported }}</p>
+                        
+                        <ul class="match-reasons-list">
+                            {% for reason in sug.best_match.match_breakdown.reasons %}
+                                <li class="match-reason-tag">✓ {{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ url_for('item_details', item_id=sug.best_match.item_id) }}" class="btn btn-outline btn-sm">Inspect Details</a>
+                        <a href="{{ url_for('claim_item', item_id=sug.best_match.item_id) }}" class="btn btn-primary btn-sm">Claim This Item</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- My Recent Reports -->
+<div>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h2 style="font-size: 1.35rem;">My Recent Item Reports</h2>
+        <a href="{{ url_for('my_reports') }}" class="btn btn-secondary btn-sm">View All Reports &rarr;</a>
+    </div>
+
+    {% if my_recent_reports %}
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Report Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in my_recent_reports %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ report.item_name }}</td>
+                                <td><span class="badge badge-{{ report.item_type|lower }}">{{ report.item_type }}</span></td>
+                                <td>{{ report.category }}</td>
+                                <td>{{ report.location }}</td>
+                                <td>{{ report.date_reported }}</td>
+                                <td><span class="badge badge-{{ report.status|lower }}">{{ report.status }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('item_details', item_id=report.item_id) }}" class="btn btn-outline btn-sm">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 36px;">
+            <p style="color: var(--text-muted); margin-bottom: 14px;">You have not submitted any lost or found reports yet.</p>
+            <a href="{{ url_for('report_lost') }}" class="btn btn-primary btn-sm">Submit Your First Report</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

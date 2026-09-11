@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error{% endblock %}
+
+{% block content %}
+<div class="card form-card" style="text-align: center; padding: 60px 24px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">⚠️</div>
+    <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #fff;">500 - Server Encountered an Error</h1>
+    <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 28px; font-size: 0.95rem;">
+        An unexpected server or database issue occurred while processing your request. Please rest assured your data is safe.
+    </p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Safety (Home)</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

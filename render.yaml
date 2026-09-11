@@ -1,0 +1,34 @@
+# Render Blueprint Specification for School Lost & Found Management System
+# Class 12 CBSE Computer Science (083) Project
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: school-lost-found
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install -r requirements.txt && python init_db.py"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: DB_MODE
+        value: auto
+      # Optional: To connect to an external cloud MySQL (e.g. Aiven, TiDB, Clever Cloud):
+      # - key: MYSQL_HOST
+      #   value: your-cloud-mysql-host.com
+      # - key: MYSQL_USER
+      #   value: root
+      # - key: MYSQL_PASSWORD
+      #   value: your-password
+      # - key: MYSQL_DB
+      #   value: school_lost_found
+      # - key: MYSQL_PORT
+      #   value: "3306"

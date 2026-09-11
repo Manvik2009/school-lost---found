@@ -1,0 +1,16 @@
+# Configuration for Google Firebase App Hosting
+# Next-generation server-side web app hosting on Google Cloud
+# https://firebase.google.com/docs/app-hosting
+
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+env:
+  - variable: DB_MODE
+    value: auto
+  - variable: FLASK_DEBUG
+    value: "False"

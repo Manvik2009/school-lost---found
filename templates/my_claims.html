@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}My Claims - School Lost & Found{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.85rem; margin-bottom: 6px;">My Submitted Claims</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Review the administrative verification status of items you have claimed.</p>
+</div>
+
+{% if claims %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Target Found Item</th>
+                        <th>Category</th>
+                        <th>Claim Reason</th>
+                        <th>Lost Location Stated</th>
+                        <th>Date Filed</th>
+                        <th>Claim Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in claims %}
+                        <tr>
+                            <td>#{{ c.claim_id }}</td>
+                            <td style="font-weight: 600;">{{ c.item_name }}</td>
+                            <td>{{ c.category }}</td>
+                            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.reason }}</td>
+                            <td>{{ c.lost_location }}</td>
+                            <td>{{ c.created_at }}</td>
+                            <td>
+                                {% if c.status == 'PENDING' %}
+                                    <span class="badge badge-pending">PENDING</span>
+                                {% elif c.status == 'APPROVED' %}
+                                    <span class="badge badge-open">APPROVED</span>
+                                {% else %}
+                                    <span class="badge badge-rejected">REJECTED</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('item_details', item_id=c.item_id) }}" class="btn btn-outline btn-sm">Inspect Item</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 48px;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📑</div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 6px;">No claims submitted yet</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">
+            If you identify your lost property among the found items catalog, you can file a verification claim.
+        </p>
+        <a href="{{ url_for('search', item_type='FOUND') }}" class="btn btn-primary btn-sm">Browse Found Items Catalog &rarr;</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Items - Admin Control{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; margin-bottom: 4px;">School Items Management</h1>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">Audit, moderate, approve, or archive items across all school departments.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="liveTableSearch" class="form-control" placeholder="⚡ Live search in table..." style="max-width: 250px;">
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="{{ url_for('admin_items', status='ALL', type=type_filter) }}" class="filter-tab {% if status_filter == 'ALL' %}active{% endif %}">All Statuses</a>
+    <a href="{{ url_for('admin_items', status='PENDING', type=type_filter) }}" class="filter-tab {% if status_filter == 'PENDING' %}active{% endif %}">Pending Review</a>
+    <a href="{{ url_for('admin_items', status='OPEN', type=type_filter) }}" class="filter-tab {% if status_filter == 'OPEN' %}active{% endif %}">Open on Board</a>
+    <a href="{{ url_for('admin_items', status='CLAIMED', type=type_filter) }}" class="filter-tab {% if status_filter == 'CLAIMED' %}active{% endif %}">Claimed</a>
+    <a href="{{ url_for('admin_items', status='RETURNED', type=type_filter) }}" class="filter-tab {% if status_filter == 'RETURNED' %}active{% endif %}">Returned</a>
+    <a href="{{ url_for('admin_items', status='REJECTED', type=type_filter) }}" class="filter-tab {% if status_filter == 'REJECTED' %}active{% endif %}">Rejected</a>
+</div>
+
+<div class="filter-tabs" style="margin-top: -12px; margin-bottom: 24px;">
+    <a href="{{ url_for('admin_items', status=status_filter, type='ALL') }}" class="filter-tab {% if type_filter == 'ALL' %}active{% endif %}">Both Types</a>
+    <a href="{{ url_for('admin_items', status=status_filter, type='LOST') }}" class="filter-tab {% if type_filter == 'LOST' %}active{% endif %}">Lost Only</a>
+    <a href="{{ url_for('admin_items', status=status_filter, type='FOUND') }}" class="filter-tab {% if type_filter == 'FOUND' %}active{% endif %}">Found Only</a>
+</div>
+
+{% if items %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Reporter</th>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr data-search-row="true">
+                            <td>#{{ item.item_id }}</td>
+                            <td style="font-weight: 600;">{{ item.item_name }}</td>
+                            <td><span class="badge badge-{{ item.item_type|lower }}">{{ item.item_type }}</span></td>
+                            <td>{{ item.category }}</td>
+                            <td>
+                                <div>{{ item.reporter_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">{{ item.reporter_student_id }}</div>
+                            </td>
+                            <td>{{ item.location }}</td>
+                            <td>{{ item.date_reported }}</td>
+                            <td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td>
+                            <td>
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                    <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm">View</a>
+
+                                    {% if item.status == 'PENDING' %}
+                                        <form method="POST" action="{{ url_for('admin_approve_item', item_id=item.item_id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('admin_reject_item', item_id=item.item_id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if item.status in ('OPEN', 'CLAIMED') %}
+                                        <form method="POST" action="{{ url_for('admin_mark_returned', item_id=item.item_id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-primary btn-sm">Mark Returned</button>
+                                        </form>
+                                    {% endif %}
+
+                                    <form method="POST" action="{{ url_for('admin_delete_item', item_id=item.item_id) }}" style="display: inline;">
+                                        <button type="button" class="btn btn-danger btn-sm" data-confirm="Are you sure you want to permanently delete '{{ item.item_name }}' (Item #{{ item.item_id }})?" data-action-type="danger" data-title="Delete Item Report">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 48px;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 6px;">No items match this filter</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">Try selecting another status tab or clear filters.</p>
+        <a href="{{ url_for('admin_items') }}" class="btn btn-secondary btn-sm">Reset Item Filters</a>
+    </div>
+{% endif %}
+{% endblock %}

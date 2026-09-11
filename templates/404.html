@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Item or Page Not Found{% endblock %}
+
+{% block content %}
+<div class="card form-card" style="text-align: center; padding: 60px 24px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+    <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #fff;">404 - Lost in the Hallway?</h1>
+    <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 28px; font-size: 0.95rem;">
+        The item report or school portal page you are searching for does not exist, has been removed, or is still awaiting administrative review.
+    </p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Homepage</a>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary">Search Item Catalog</a>
+    </div>
+</div>
+{% endblock %}

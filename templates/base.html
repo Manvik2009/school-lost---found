@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Lost & Found{% endblock %} | CBSE Class 12 CS</title>
+    <meta name="description" content="A digital Lost and Found portal for school students and administrators. Class 12 CBSE Computer Science project.">
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sticky Navigation Bar -->
+    <nav class="navbar">
+        <div class="container navbar-inner">
+            <a href="{{ url_for('index') }}" class="brand-logo">
+                <div class="brand-icon">🔍</div>
+                <span>School Lost &amp; Found</span>
+            </a>
+
+            <!-- Navigation Links -->
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('search') }}" class="nav-link {% if request.endpoint == 'search' %}active{% endif %}">Search Items</a></li>
+
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'admin' %}
+                        <li><a href="{{ url_for('admin_dashboard') }}" class="nav-link admin-badge-link {% if 'admin' in request.endpoint %}active{% endif %}">🛡️ Admin Portal</a></li>
+                        <li><a href="{{ url_for('admin_items') }}" class="nav-link {% if request.endpoint == 'admin_items' %}active{% endif %}">Manage Items</a></li>
+                        <li><a href="{{ url_for('admin_claims') }}" class="nav-link {% if request.endpoint == 'admin_claims' %}active{% endif %}">Claims Queue</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                        <li><a href="{{ url_for('my_reports') }}" class="nav-link {% if request.endpoint == 'my_reports' %}active{% endif %}">My Reports</a></li>
+                        <li><a href="{{ url_for('my_claims') }}" class="nav-link {% if request.endpoint == 'my_claims' %}active{% endif %}">My Claims</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+            <!-- Navigation Action Buttons -->
+            <div class="nav-actions">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('report_lost') }}" class="btn btn-outline btn-sm">Report Lost</a>
+                    <a href="{{ url_for('report_found') }}" class="btn btn-primary btn-sm">Report Found</a>
+                    <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-sm" title="My Profile">👤 {{ session.get('name', '').split(' ')[0] }}</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm">Log In</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Register</a>
+                {% endif %}
+
+                <button class="mobile-toggle" aria-label="Toggle Navigation Menu">&#9776;</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Body Container -->
+    <main class="container" style="padding-top: 24px; padding-bottom: 40px; flex: 1;">
+        <!-- Flash Alert Messages -->
+        <div class="alert-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Reusable Confirmation Modal -->
+    <div id="confirmModal" class="modal-backdrop">
+        <div class="modal-dialog">
+            <h3 id="modalTitle" class="modal-title">Confirm Action</h3>
+            <p id="modalBody" class="modal-body">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button type="button" id="modalCancelBtn" class="btn btn-secondary btn-sm">Cancel</button>
+                <button type="button" id="modalConfirmBtn" class="btn btn-danger btn-sm">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 6px;">School Lost &amp; Found Portal</h4>
+                    <p style="font-size: 0.82rem; color: var(--text-dim); max-width: 480px;">
+                        CBSE Class 12 Computer Science (083) Project. Designed with clean Python Flask backend, MySQL relational database connectivity, and modern Vanilla web technologies.
+                    </p>
+                </div>
+                <div style="font-size: 0.82rem; text-align: right;">
+                    <span class="badge badge-open" style="font-size: 0.72rem;">DB: {{ db_engine }} Connected</span>
+                    <p style="margin-top: 6px; color: var(--text-dim);">Academic Year 2025–2026</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; {{ current_year }} School Lost &amp; Found System. Developed for CBSE Class 12 Practical Examination &amp; Viva.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Vanilla JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Lost &amp; Found Portal | Class 12 CBSE CS 083</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #111a33;
+            --card-bg: rgba(18, 28, 56, 0.75);
+            --card-border: rgba(72, 202, 228, 0.2);
+            --accent-cyan: #48cae4;
+            --accent-glow: #00b4d8;
+            --accent-gold: #ffb703;
+            --accent-red: #ef476f;
+            --accent-green: #06d6a0;
+            --text-main: #f8f9fa;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at 50% 0%, #172554 0%, #0a0f1d 75%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 32px;
+            background: rgba(10, 15, 29, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(72, 202, 228, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid var(--card-border);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 50px 20px 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Cloud Notice Banner */
+        .cloud-banner {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            padding: 16px 24px;
+            background: linear-gradient(90deg, rgba(0, 180, 216, 0.15) 0%, rgba(255, 183, 3, 0.15) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cloud-info h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .cloud-info p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .btn-render {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-render:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 180, 216, 0.5);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            max-width: 1000px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Catalog Section */
+        .catalog {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+            width: 100%;
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .catalog-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            color: #fff;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px;
+            background: rgba(10, 15, 29, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.92rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(72, 202, 228, 0.3);
+        }
+
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(72, 202, 228, 0.15);
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .item-type-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-lost {
+            background: rgba(239, 71, 111, 0.2);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 71, 111, 0.4);
+        }
+
+        .badge-found {
+            background: rgba(6, 214, 160, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(6, 214, 160, 0.4);
+        }
+
+        .item-category {
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .item-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .item-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .item-meta {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Demo Credentials Modal / Box */
+        .credentials-box {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            padding: 24px;
+            background: rgba(18, 28, 56, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        .credentials-box h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cred-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .cred-table th, .cred-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cred-table th {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .cred-code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent-gold);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 24px;
+            text-align: center;
+            background: #070b14;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <span class="logo-icon">🔍</span>
+            <span>School Lost &amp; Found</span>
+        </a>
+        <div class="nav-links">
+            <span class="badge-tag">CBSE Class 12 CS (083)</span>
+            <span class="badge-tag" style="background: rgba(6, 214, 160, 0.15); color: var(--accent-green); border-color: rgba(6, 214, 160, 0.3);">🔥 Firebase CDN Live</span>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <span class="badge-tag" style="margin-bottom: 16px;">Academic Session 2025–2026</span>
+        <h1>Lost &amp; Found Portal</h1>
+        <p>
+            CBSE Computer Science Board Examination Project. Demonstrating Python Flask backend, relational database queries (MySQL / SQLite), and an automated 100-point similarity matching algorithm.
+        </p>
+    </section>
+
+    <!-- Cloud Banner: Render Backend Link -->
+    <div class="cloud-banner">
+        <div class="cloud-info">
+            <h4>🚀 Dynamic Python Backend on Render</h4>
+            <p>Firebase Hosting serves this fast CDN portal. To launch the dynamic Flask backend with live logins &amp; SQL reports:</p>
+        </div>
+        <a href="https://dashboard.render.com" target="_blank" class="btn-render">
+            Deploy on Render ⚡
+        </a>
+    </div>
+
+    <!-- Live Stats -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-num" id="stat-total">10</div>
+            <div class="stat-label">Total Cataloged</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color: var(--accent-red);">5</div>
+            <div class="stat-label">Lost Reports</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color: var(--accent-green);">5</div>
+            <div class="stat-label">Found Belongings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color: var(--accent-gold);">2</div>
+            <div class="stat-label">Handovers / Returned</div>
+        </div>
+    </section>
+
+    <!-- Catalog -->
+    <section class="catalog">
+        <div class="catalog-header">
+            <h2>📦 Pre-Seeded Demonstration Items</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, location, or color..." onkeyup="filterItems()">
+            </div>
+        </div>
+
+        <div class="items-grid" id="itemsContainer">
+            <!-- Item 1 -->
+            <div class="item-card" data-search="black scientific calculator casio electronics physics lab">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-lost">LOST</span>
+                        <span class="item-category">Electronics</span>
+                    </div>
+                    <h3 class="item-title">Black Scientific Calculator</h3>
+                    <p class="item-desc">Casio fx-991EX ClassWiz calculator with solar panel left behind near desk 14.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 Physics Lab 302</span>
+                    <span>🗓️ 02 Sep 2026</span>
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="item-card" data-search="black scientific calculator casio physics lab found">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-found">FOUND</span>
+                        <span class="item-category">Electronics</span>
+                    </div>
+                    <h3 class="item-title">Casio Scientific Calculator</h3>
+                    <p class="item-desc">Black Casio calculator discovered on lab bench during practical period.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 Physics Lab</span>
+                    <span>🗓️ 03 Sep 2026</span>
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="item-card" data-search="blue stainless steel water bottle milton sports pavilion">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-found">FOUND</span>
+                        <span class="item-category">Water Bottle</span>
+                    </div>
+                    <h3 class="item-title">Blue Milton Water Bottle</h3>
+                    <p class="item-desc">750ml blue stainless steel thermos bottle with minor scratch on bottom.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 Sports Pavilion</span>
+                    <span>🗓️ 04 Sep 2026</span>
+                </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="item-card" data-search="school student id card priya patel library reading hall">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-found">FOUND</span>
+                        <span class="item-category">ID Card</span>
+                    </div>
+                    <h3 class="item-title">Student Identity Card</h3>
+                    <p class="item-desc">Class 12 ID card belonging to Priya Patel (STU-1002) found near newspaper stand.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 Library Hall</span>
+                    <span>🗓️ 05 Sep 2026</span>
+                </div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="item-card" data-search="wireless bluetooth earphones boat airdopes computer lab">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-lost">LOST</span>
+                        <span class="item-category">Electronics</span>
+                    </div>
+                    <h3 class="item-title">Wireless Bluetooth Earphones</h3>
+                    <p class="item-desc">Boat Airdopes in white charging case misplaced during Informatics Practice.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 Computer Lab 2</span>
+                    <span>🗓️ 06 Sep 2026</span>
+                </div>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="item-card" data-search="black wildcraft backpack canteen textbooks">
+                <div>
+                    <div class="item-top">
+                        <span class="item-type-badge badge-found">FOUND</span>
+                        <span class="item-category">Accessories</span>
+                    </div>
+                    <h3 class="item-title">Black Wildcraft Backpack</h3>
+                    <p class="item-desc">Double compartment school bag with Class 12 NCERT textbooks inside.</p>
+                </div>
+                <div class="item-meta">
+                    <span>📍 School Canteen</span>
+                    <span>🗓️ 07 Sep 2026</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Credentials Table -->
+    <section class="credentials-box">
+        <h3>🔑 CBSE Practical Examination Pre-Seeded Credentials</h3>
+        <table class="cred-table">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Access Permissions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Administrator</strong></td>
+                    <td><span class="cred-code">admin@school.local</span></td>
+                    <td><span class="cred-code">Admin@123</span></td>
+                    <td>Approve claims, moderate reported items, view SQL audit logs</td>
+                </tr>
+                <tr>
+                    <td><strong>Student</strong></td>
+                    <td><span class="cred-code">aravind@school.local</span></td>
+                    <td><span class="cred-code">Student@123</span></td>
+                    <td>Report lost/found belongings, claim misplaced items</td>
+                </tr>
+                <tr>
+                    <td><strong>Student</strong></td>
+                    <td><span class="cred-code">priya@school.local</span></td>
+                    <td><span class="cred-code">Student@123</span></td>
+                    <td>Standard student account with pre-seeded claims history</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        CBSE Class 12 Computer Science (083) Project • Academic Year 2025–2026 • Hosted on Google Firebase &amp; Render Cloud
+    </footer>
+
+    <!-- Interactive Filter Script -->
+    <script>
+        function filterItems() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.item-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const searchData = card.getAttribute('data-search');
+                if (searchData.includes(input)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

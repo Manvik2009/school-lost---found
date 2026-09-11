@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}User Directory - Admin Control{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; margin-bottom: 4px;">School User Directory</h1>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">Audit registered school accounts, roles, and activity records.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="liveTableSearch" class="form-control" placeholder="⚡ Search student by name / ID..." style="max-width: 260px;">
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Student / Employee ID</th>
+                    <th>School Email</th>
+                    <th>Role</th>
+                    <th>Reports Filed</th>
+                    <th>Claims Filed</th>
+                    <th>Registration Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr data-search-row="true">
+                        <td>#{{ u.user_id }}</td>
+                        <td style="font-weight: 600;">
+                            {{ u.name }}
+                            {% if u.user_id == session.get('user_id') %}
+                                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 0.65rem;">You</span>
+                            {% endif %}
+                        </td>
+                        <td><span style="color: var(--accent-cyan); font-weight: 600;">{{ u.student_id }}</span></td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4);">ADMIN</span>
+                            {% else %}
+                                <span class="badge badge-open">STUDENT</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.total_reports }}</td>
+                        <td>{{ u.total_claims }}</td>
+                        <td style="font-size: 0.82rem;">{{ u.created_at }}</td>
+                        <td>
+                            {% if u.user_id != session.get('user_id') %}
+                                <form method="POST" action="{{ url_for('admin_delete_user', user_id=u.user_id) }}" style="display: inline;">
+                                    <button type="button" class="btn btn-danger btn-sm" data-confirm="Are you sure you want to permanently delete user account '{{ u.name }}' ({{ u.student_id }})? All their reports and claims will be removed." data-action-type="danger" data-title="Confirm Account Deletion">
+                                        Remove
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span style="font-size: 0.78rem; color: var(--text-dim);">Protected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

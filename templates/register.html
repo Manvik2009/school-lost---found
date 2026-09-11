@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Student Account Creation{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div class="brand-icon" style="margin: 0 auto 14px; width: 48px; height: 48px; font-size: 1.5rem;">📝</div>
+        <h2 style="font-size: 1.6rem; margin-bottom: 6px;">Create Student Account</h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">Register with your official school student identification details.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('register') }}" data-validate="true">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Aravind Sharma" value="{{ form.name if form else '' }}" required autofocus>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="student_id">Student ID / Roll Number</label>
+                <input type="text" id="student_id" name="student_id" class="form-control" placeholder="e.g. STU-1005" value="{{ form.student_id if form else '' }}" required>
+                <div class="form-help">Must be unique to your admission ID.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">School Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="student@school.local" value="{{ form.email if form else '' }}" required>
+                <div class="form-help">Used for login and notifications.</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label for="reg_password" style="margin-bottom: 0;">Password</label>
+                    <button type="button" class="toggle-password-btn" data-target="reg_password" style="background: none; border: none; color: var(--accent-cyan); font-size: 0.78rem; cursor: pointer;">👁 Show</button>
+                </div>
+                <input type="password" id="reg_password" name="password" class="form-control" placeholder="Minimum 6 characters" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat password" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Complete Registration</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; font-size: 0.88rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); padding-top: 18px;">
+        Already registered? <a href="{{ url_for('login') }}" style="font-weight: 600;">Sign in to existing account &rarr;</a>
+    </div>
+</div>
+{% endblock %}

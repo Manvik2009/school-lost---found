@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Search Catalog - School Lost & Found{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.85rem; margin-bottom: 6px;">Search School Inventory</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Filter through open lost and found items recorded in the school database.</p>
+</div>
+
+<!-- Search Filter Bar Box -->
+<div class="search-bar-box">
+    <form method="GET" action="{{ url_for('search') }}">
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 260px;">
+                <label for="q">Keyword or Item Name</label>
+                <input type="text" id="q" name="q" class="form-control" placeholder="Search by title, keywords, or description..." value="{{ query_param }}">
+            </div>
+
+            <div style="flex: 1; min-width: 160px;">
+                <label for="category">Category</label>
+                <select id="category" name="category" class="form-control">
+                    <option value="ALL">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="flex: 1; min-width: 140px;">
+                <label for="item_type">Item Type</label>
+                <select id="item_type" name="item_type" class="form-control">
+                    <option value="ALL" {% if item_type == 'ALL' %}selected{% endif %}>All Types</option>
+                    <option value="LOST" {% if item_type == 'LOST' %}selected{% endif %}>Lost Only</option>
+                    <option value="FOUND" {% if item_type == 'FOUND' %}selected{% endif %}>Found Only</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 180px;">
+                <label for="location">School Location / Room</label>
+                <input type="text" id="location" name="location" class="form-control" placeholder="e.g. Physics Lab, Ground" value="{{ location }}">
+            </div>
+
+            <div style="flex: 1; min-width: 140px;">
+                <label for="color">Item Color</label>
+                <input type="text" id="color" name="color" class="form-control" placeholder="e.g. Black, Blue" value="{{ color }}">
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn btn-primary">🔍 Apply Filter</button>
+                <a href="{{ url_for('search') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Results Header -->
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <div style="font-size: 0.95rem; color: var(--text-muted);">
+        Found <strong style="color: #fff;">{{ total_results }}</strong> item(s) matching your criteria
+    </div>
+    {% if query_param or category != 'ALL' or item_type != 'ALL' or color or location %}
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="badge badge-open">Active Filter</span>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Items Grid Results -->
+{% if items %}
+    <div class="items-grid">
+        {% for item in items %}
+            <div class="item-card">
+                <div>
+                    <div class="item-card-top">
+                        <span class="badge badge-{{ item.item_type|lower }}">{{ item.item_type }}</span>
+                        <span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span>
+                    </div>
+                    <h3 class="item-name">{{ item.item_name }}</h3>
+                    <p class="item-desc">{{ item.description or 'No extra notes provided.' }}</p>
+                </div>
+
+                <div>
+                    <div class="item-meta">
+                        <div class="item-meta-row">
+                            <span class="meta-label">Category:</span>
+                            <span class="meta-value">{{ item.category }}</span>
+                        </div>
+                        <div class="item-meta-row">
+                            <span class="meta-label">Color:</span>
+                            <span class="meta-value">{{ item.color or 'Unspecified' }}</span>
+                        </div>
+                        <div class="item-meta-row">
+                            <span class="meta-label">Location:</span>
+                            <span class="meta-value">{{ item.location }}</span>
+                        </div>
+                        <div class="item-meta-row">
+                            <span class="meta-label">Date:</span>
+                            <span class="meta-value">{{ item.date_reported }}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm" style="flex: 1;">View Details</a>
+                        {% if item.item_type == 'FOUND' and item.status == 'OPEN' %}
+                            <a href="{{ url_for('claim_item', item_id=item.item_id) }}" class="btn btn-primary btn-sm">Claim</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 3rem; margin-bottom: 14px;">🔎</div>
+        <h3 style="font-size: 1.3rem; margin-bottom: 8px;">No matching items found</h3>
+        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 20px; font-size: 0.9rem;">
+            We couldn't find any open reports matching your query. Try broadening your keywords or clearing the category and color filters.
+        </p>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary btn-sm">Clear All Search Filters</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - School Lost & Found{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: var(--radius-full); background: rgba(168, 85, 247, 0.15); color: #c084fc; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">
+            🛡️ Administrative Control Center
+        </div>
+        <h1 style="font-size: 2rem; margin-bottom: 4px;">Staff Management Dashboard</h1>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">Review incoming reports, authenticate student claims, and oversee platform integrity.</p>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_items', status='PENDING') }}" class="btn btn-primary btn-sm">Review Pending Items ({{ stats.pending_reports }})</a>
+        <a href="{{ url_for('admin_claims', status='PENDING') }}" class="btn btn-outline btn-sm">Review Claims ({{ stats.pending_claims }})</a>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-sm">User Directory</a>
+    </div>
+</div>
+
+<!-- Key Database Aggregation Metrics (CBSE SQL COUNT / WHERE queries) -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon purple">👥</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Total Users ({{ stats.active_students }} Students)</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue">📦</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.total_items }}</div>
+            <div class="stat-label">Total Items Recorded</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon rose">🔍</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.lost_items }}</div>
+            <div class="stat-label">Lost Belongings</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon emerald">🏷️</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.found_items }}</div>
+            <div class="stat-label">Found Belongings</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon amber">⏳</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.pending_reports }}</div>
+            <div class="stat-label">Pending Item Reports</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">📑</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.pending_claims }}</div>
+            <div class="stat-label">Pending Claims</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon cyan">🤝</div>
+        <div class="stat-content">
+            <div class="stat-number">{{ stats.returned_items }}</div>
+            <div class="stat-label">Returned to Owner</div>
+        </div>
+    </div>
+</div>
+
+<!-- Priority Review: Pending Reports Queue -->
+<div class="card" style="margin-bottom: 30px;">
+    <div class="card-header">
+        <div>
+            <h2 style="font-size: 1.3rem;">⏳ Pending Reports Requiring Staff Approval</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                New reports must be vetted before they are published to the public search catalog.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_items', status='PENDING') }}" class="btn btn-secondary btn-sm">View All Pending &rarr;</a>
+    </div>
+
+    {% if pending_items %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Reporter</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pending_items %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ item.item_name }}</td>
+                            <td><span class="badge badge-{{ item.item_type|lower }}">{{ item.item_type }}</span></td>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.location }}</td>
+                            <td>{{ item.reporter_name }}</td>
+                            <td>{{ item.date_reported }}</td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <form method="POST" action="{{ url_for('admin_approve_item', item_id=item.item_id) }}">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin_reject_item', item_id=item.item_id) }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                    <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm">Inspect</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 24px; color: var(--status-open); font-size: 0.95rem;">
+            ✓ All item reports have been reviewed. Zero pending reports in queue!
+        </div>
+    {% endif %}
+</div>
+
+<!-- Priority Review: Pending Claims Queue -->
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2 style="font-size: 1.3rem;">📑 Pending Student Claims Requiring Verification</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                Review stated loss details to confirm legitimate student ownership.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_claims', status='PENDING') }}" class="btn btn-secondary btn-sm">View All Claims &rarr;</a>
+    </div>
+
+    {% if pending_claims %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Item</th>
+                        <th>Claiming Student</th>
+                        <th>Reason Given</th>
+                        <th>Lost Location Stated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in pending_claims %}
+                        <tr>
+                            <td>#{{ c.claim_id }}</td>
+                            <td style="font-weight: 600;">{{ c.item_name }}</td>
+                            <td>{{ c.claimant_name }}</td>
+                            <td style="max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.reason }}</td>
+                            <td>{{ c.lost_location }}</td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <form method="POST" action="{{ url_for('admin_approve_claim', claim_id=c.claim_id) }}">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve Claim</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin_reject_claim', claim_id=c.claim_id) }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject Claim</button>
+                                    </form>
+                                    <a href="{{ url_for('item_details', item_id=c.item_id) }}" class="btn btn-outline btn-sm">View Item</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 24px; color: var(--status-open); font-size: 0.95rem;">
+            ✓ All student claims have been verified. Zero pending claims in queue!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

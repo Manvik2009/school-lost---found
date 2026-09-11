@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Claims - Admin Review{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; margin-bottom: 4px;">Student Claims Verification</h1>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">Examine claimant proof and approve genuine ownership before releasing found belongings.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="liveTableSearch" class="form-control" placeholder="⚡ Search in claims..." style="max-width: 250px;">
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="{{ url_for('admin_claims', status='ALL') }}" class="filter-tab {% if status_filter == 'ALL' %}active{% endif %}">All Claims</a>
+    <a href="{{ url_for('admin_claims', status='PENDING') }}" class="filter-tab {% if status_filter == 'PENDING' %}active{% endif %}">Pending Verification</a>
+    <a href="{{ url_for('admin_claims', status='APPROVED') }}" class="filter-tab {% if status_filter == 'APPROVED' %}active{% endif %}">Approved</a>
+    <a href="{{ url_for('admin_claims', status='REJECTED') }}" class="filter-tab {% if status_filter == 'REJECTED' %}active{% endif %}">Rejected</a>
+</div>
+
+{% if claims %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Target Item</th>
+                        <th>Claimant Student</th>
+                        <th>Claim Reason</th>
+                        <th>Lost Location Stated</th>
+                        <th>Additional Proof</th>
+                        <th>Date Filed</th>
+                        <th>Status</th>
+                        <th>Review Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in claims %}
+                        <tr data-search-row="true">
+                            <td>#{{ c.claim_id }}</td>
+                            <td style="font-weight: 600;">
+                                <a href="{{ url_for('item_details', item_id=c.item_id) }}" style="color: #fff; text-decoration: underline;">
+                                    {{ c.item_name }}
+                                </a>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Status: {{ c.item_status }}</div>
+                            </td>
+                            <td>
+                                <div>{{ c.claimant_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--accent-cyan);">{{ c.claimant_student_id }}</div>
+                                <div style="font-size: 0.72rem; color: var(--text-dim);">{{ c.claimant_email }}</div>
+                            </td>
+                            <td style="max-width: 180px;">{{ c.reason }}</td>
+                            <td>{{ c.lost_location }}</td>
+                            <td style="max-width: 180px; font-size: 0.82rem; color: var(--text-muted);">
+                                {{ c.additional_info or 'None' }}
+                            </td>
+                            <td style="font-size: 0.82rem;">{{ c.created_at }}</td>
+                            <td>
+                                {% if c.status == 'PENDING' %}
+                                    <span class="badge badge-pending">PENDING</span>
+                                {% elif c.status == 'APPROVED' %}
+                                    <span class="badge badge-open">APPROVED</span>
+                                {% else %}
+                                    <span class="badge badge-rejected">REJECTED</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if c.status == 'PENDING' %}
+                                    <div style="display: flex; gap: 6px;">
+                                        <form method="POST" action="{{ url_for('admin_approve_claim', claim_id=c.claim_id) }}">
+                                            <button type="button" class="btn btn-success btn-sm" data-confirm="Approve this claim? Item status will update to CLAIMED." data-action-type="approve" data-title="Approve Student Claim">
+                                                Approve
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('admin_reject_claim', claim_id=c.claim_id) }}">
+                                            <button type="button" class="btn btn-danger btn-sm" data-confirm="Reject this claim as unverified?" data-action-type="danger" data-title="Reject Student Claim">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% else %}
+                                    <span style="font-size: 0.8rem; color: var(--text-dim);">Reviewed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 48px;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📑</div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 6px;">No claims found</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">There are currently no claims matching this filter.</p>
+    </div>
+{% endif %}
+{% endblock %}

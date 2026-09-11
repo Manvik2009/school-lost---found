@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Digital Belongings Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-pill">
+        <span>✨ Class 12 CBSE Computer Science (083) Project</span>
+    </div>
+    <h1 class="hero-title">
+        Lost something?<br>
+        <span>Let's help you find it.</span>
+    </h1>
+    <p class="hero-subtitle">
+        A simple and secure way for our school community to report, find and return lost belongings.
+    </p>
+
+    <div class="hero-cta">
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('report_lost') }}" class="btn btn-primary btn-lg">📢 REPORT LOST ITEM</a>
+            <a href="{{ url_for('report_found') }}" class="btn btn-outline btn-lg">📦 REPORT FOUND ITEM</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">📢 REPORT LOST ITEM</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">📦 REPORT FOUND ITEM</a>
+        {% endif %}
+        <a href="{{ url_for('search') }}" class="btn btn-secondary btn-lg">🔍 Search All Items</a>
+    </div>
+</section>
+
+<!-- Visual 5-Step Process Flow -->
+<section class="process-section">
+    <h2 class="section-title">How Our School System Works</h2>
+    <p class="section-desc">From losing an item to safe verification and handover in five simple steps.</p>
+
+    <div class="process-flow">
+        <div class="process-step">
+            <div class="step-num">1</div>
+            <h3 class="step-title" style="color: var(--type-lost);">LOST</h3>
+            <p class="step-desc">A student misplaces a personal belonging on school campus.</p>
+        </div>
+
+        <div class="process-step">
+            <div class="step-num">2</div>
+            <h3 class="step-title" style="color: var(--status-pending);">REPORTED</h3>
+            <p class="step-desc">Either the owner or the finder submits details to the portal.</p>
+        </div>
+
+        <div class="process-step">
+            <div class="step-num">3</div>
+            <h3 class="step-title" style="color: var(--accent-cyan);">MATCHED</h3>
+            <p class="step-desc">Our intelligent 100-point algorithm identifies possible item matches.</p>
+        </div>
+
+        <div class="process-step">
+            <div class="step-num">4</div>
+            <h3 class="step-title" style="color: var(--status-claimed);">CLAIMED</h3>
+            <p class="step-desc">The rightful student submits verification details for admin review.</p>
+        </div>
+
+        <div class="process-step">
+            <div class="step-num">5</div>
+            <h3 class="step-title" style="color: var(--status-open);">RETURNED</h3>
+            <p class="step-desc">After staff verification, the belonging is safely handed back.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Live Platform Statistics (Dynamic Database Queries) -->
+<section style="margin-bottom: 50px;">
+    <h2 class="section-title" style="margin-bottom: 24px;">Platform Transparency</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">📊</div>
+            <div class="stat-content">
+                <div class="stat-number">{{ stats.total_items }}</div>
+                <div class="stat-label">Total Items Logged</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon emerald">📦</div>
+            <div class="stat-content">
+                <div class="stat-number">{{ stats.found_items }}</div>
+                <div class="stat-label">Items Found &amp; Safe</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon cyan">🤝</div>
+            <div class="stat-content">
+                <div class="stat-number">{{ stats.returned_items }}</div>
+                <div class="stat-label">Items Safely Returned</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon purple">🎓</div>
+            <div class="stat-content">
+                <div class="stat-number">{{ stats.active_students }}</div>
+                <div class="stat-label">Active School Members</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Open Items -->
+<section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <div>
+            <h2 style="font-size: 1.5rem;">Recently Reported Items</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Browse open items currently waiting for their rightful owners.</p>
+        </div>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary btn-sm">View All in Search &rarr;</a>
+    </div>
+
+    {% if recent_items %}
+        <div class="items-grid">
+            {% for item in recent_items %}
+                <div class="item-card">
+                    <div>
+                        <div class="item-card-top">
+                            <span class="badge badge-{{ item.item_type|lower }}">{{ item.item_type }}</span>
+                            <span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span>
+                        </div>
+                        <h3 class="item-name">{{ item.item_name }}</h3>
+                        <p class="item-desc">{{ item.description or 'No additional details provided.' }}</p>
+                    </div>
+
+                    <div>
+                        <div class="item-meta">
+                            <div class="item-meta-row">
+                                <span class="meta-label">Category:</span>
+                                <span class="meta-value">{{ item.category }}</span>
+                            </div>
+                            <div class="item-meta-row">
+                                <span class="meta-label">Location:</span>
+                                <span class="meta-value">{{ item.location }}</span>
+                            </div>
+                            <div class="item-meta-row">
+                                <span class="meta-label">Reported:</span>
+                                <span class="meta-value">{{ item.date_reported }}</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{{ url_for('item_details', item_id=item.item_id) }}" class="btn btn-outline btn-sm" style="flex: 1;">View Details</a>
+                            {% if item.item_type == 'FOUND' and item.status == 'OPEN' %}
+                                <a href="{{ url_for('claim_item', item_id=item.item_id) }}" class="btn btn-primary btn-sm">Claim</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 40px;">
+            <p style="color: var(--text-muted); font-size: 1.05rem;">No open items reported at this moment.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
