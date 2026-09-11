@@ -29,7 +29,7 @@ app.config.from_object(Config)
 # ---------------------------------------------------------------------------
 # Database Connectivity & Management (CBSE CS 083 Concepts)
 # Demonstrates: MySQL Connection, Cursor, Execute, Commit, Fetch, and Exception Handling
-# Includes zero-configuration SQLite cloud fallback for Render & Firebase hosting
+# Designed for CBSE Class 12 Computer Science Project with standard MySQL 8.0
 # ---------------------------------------------------------------------------
 
 ACTIVE_DB_TYPE = None  # 'mysql' or 'sqlite'

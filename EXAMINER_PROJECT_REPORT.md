@@ -1,7 +1,7 @@
 # CBSE Class 12 Computer Science (Sub Code: 083) Project Report
 # Digital Belongings Portal — School Lost & Found Management System
 
-🌐 **Live Deployed Web Application:** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
+💻 **Local Host Application:** `http://127.0.0.1:5000` | **Database:** MySQL 8.0
 
 ---
 

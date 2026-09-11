@@ -3,8 +3,6 @@
 **Class 12 CBSE Computer Science (Subject Code: 083) Practical Examination Project**  
 *Academic Year: 2025–2026*
 
-🌐 **Live Deployed Web Portal:** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
-
 ---
 
 ## 📋 Table of Contents
@@ -16,10 +14,9 @@
 6. [Project File Structure](#6-project-file-structure)
 7. [Database Architecture & Schema](#7-database-architecture--schema)
 8. [Installation & Setup Guide](#8-installation--setup-guide)
-9. [Cloud Deployment (Render & Firebase Hosting)](#9-cloud-deployment-render--firebase-hosting)
-10. [Pre-Configured Demo Credentials](#10-pre-configured-demo-credentials)
-11. [CBSE Viva Voce Guide (Questions & Answers)](#11-cbse-viva-voce-guide-questions--answers)
-12. [Future Scope](#12-future-scope)
+9. [Pre-Configured Demo Credentials](#9-pre-configured-demo-credentials)
+10. [CBSE Viva Voce Guide (Questions & Answers)](#10-cbse-viva-voce-guide-questions--answers)
+11. [Future Scope](#11-future-scope)
 
 ---
 
@@ -234,20 +231,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 9. Cloud Deployment (Render & Firebase Hosting)
-
-The application is deployed live and pre-configured for instant zero-configuration hosting:
-
-- **Live Web Service (Render):** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
-- **Render Hosting Configuration:** Native Python web service via [`render.yaml`](render.yaml) & [`Procfile`](Procfile) with Gunicorn WSGI server.
-- **Firebase Hosting:** Global CDN deployment via [`firebase.json`](firebase.json), [`.firebaserc`](.firebaserc), and [`Dockerfile`](Dockerfile).
-- **Dual Database Engine:** Automatically runs in MySQL 8.0 mode when MySQL is available, and falls back to SQLite in cloud environments with zero crashes.
-
-📖 **For complete copy-paste instructions, see the dedicated [Deployment Guide](DEPLOYMENT.md).**
-
----
-
-## 10. Pre-Configured Demo Credentials
+## 9. Pre-Configured Demo Credentials
 
 For convenience during classroom demonstrations or board viva examination, sample accounts are pre-seeded:
 

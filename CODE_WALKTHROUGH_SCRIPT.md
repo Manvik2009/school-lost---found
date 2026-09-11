@@ -1,7 +1,7 @@
 # Examiner Presentation & Code Walkthrough Script
 # Digital Belongings Portal — School Lost & Found Management System
 
-🌐 **Live Deployed Examination Portal:** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
+💻 **Local Examination Portal:** `http://127.0.0.1:5000` (Python Flask + MySQL 8.0)
 
 This guide is your **step-by-step presentation script**. Use it when demonstrating the application and presenting the code to internal and external examiners.
 

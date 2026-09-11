@@ -20,10 +20,10 @@ class Config:
     ADMIN_EMAIL = "admin@school.local"
     ADMIN_DEFAULT_PASSWORD = "Admin@123"
 
-    # Server & Port Settings (Render / Cloud Run / Local)
+    # Server & Port Settings (Local School Lab / Workstation)
     PORT = int(os.environ.get('PORT', 5000))
-    HOST = os.environ.get('HOST', '0.0.0.0')
+    HOST = os.environ.get('HOST', '127.0.0.1')
 
-    # Database Mode ('mysql' primary for CBSE 083, or 'auto' / 'sqlite' cloud fallback)
+    # Database Mode ('mysql' primary for CBSE 083, or 'sqlite' fallback)
     DB_MODE = os.environ.get('DB_MODE', 'mysql').lower()
     SQLITE_PATH = os.environ.get('SQLITE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'school_lost_found.db'))
