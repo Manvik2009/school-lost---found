@@ -24,6 +24,6 @@ class Config:
     PORT = int(os.environ.get('PORT', 5000))
     HOST = os.environ.get('HOST', '0.0.0.0')
 
-    # Database Mode ('auto' tries MySQL first and falls back to SQLite if offline, or 'mysql', 'sqlite')
-    DB_MODE = os.environ.get('DB_MODE', 'auto').lower()
+    # Database Mode ('mysql' primary for CBSE 083, or 'auto' / 'sqlite' cloud fallback)
+    DB_MODE = os.environ.get('DB_MODE', 'mysql').lower()
     SQLITE_PATH = os.environ.get('SQLITE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'school_lost_found.db'))

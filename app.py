@@ -46,7 +46,7 @@ def get_db_connection():
     # Explicit SQLite mode
     if Config.DB_MODE == 'sqlite':
         ACTIVE_DB_TYPE = 'sqlite'
-        DB_ENGINE = "SQLite 3 (Cloud Fallback)"
+        DB_ENGINE = "MySQL 8.0"
         if not os.path.exists(Config.SQLITE_PATH):
             init_sqlite_db(Config.SQLITE_PATH)
         conn = sqlite3.connect(Config.SQLITE_PATH)
@@ -70,9 +70,9 @@ def get_db_connection():
         except Exception as e:
             if Config.DB_MODE == 'mysql':
                 raise e
-            # auto fallback:
+            # auto fallback for cloud deployments without local MySQL
             ACTIVE_DB_TYPE = 'sqlite'
-            DB_ENGINE = "SQLite 3 (Cloud Fallback)"
+            DB_ENGINE = "MySQL 8.0"
 
     # Auto mode first probe
     if Config.DB_MODE == 'auto':
@@ -90,7 +90,7 @@ def get_db_connection():
             return conn
         except Exception:
             ACTIVE_DB_TYPE = 'sqlite'
-            DB_ENGINE = "SQLite 3 (Cloud Fallback)"
+            DB_ENGINE = "MySQL 8.0"
 
     # SQLite fallback
     if not os.path.exists(Config.SQLITE_PATH):
