@@ -20,15 +20,15 @@ services:
       - key: FLASK_DEBUG
         value: "False"
       - key: DB_MODE
-        value: auto
-      # Optional: To connect to an external cloud MySQL (e.g. Aiven, TiDB, Clever Cloud):
-      # - key: MYSQL_HOST
-      #   value: your-cloud-mysql-host.com
-      # - key: MYSQL_USER
-      #   value: root
-      # - key: MYSQL_PASSWORD
-      #   value: your-password
-      # - key: MYSQL_DB
-      #   value: school_lost_found
-      # - key: MYSQL_PORT
-      #   value: "3306"
+        value: mysql
+      # Cloud MySQL (Filess.io / Aiven / Clever Cloud) -- fill in on Render Dashboard
+      - key: MYSQL_HOST
+        value: REPLACE_WITH_HOST
+      - key: MYSQL_USER
+        value: REPLACE_WITH_USER
+      - key: MYSQL_PASSWORD
+        value: REPLACE_WITH_PASSWORD
+      - key: MYSQL_DB
+        value: school_lost_found
+      - key: MYSQL_PORT
+        value: "3306"
