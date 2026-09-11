@@ -34,16 +34,46 @@ app.config.from_object(Config)
 
 ACTIVE_DB_TYPE = None  # 'mysql' or 'sqlite'
 DB_ENGINE = "MySQL 8.0"
+_mysql_pool = None  # Connection pool (created once at startup)
+
+def _init_connection_pool():
+    """
+    Creates a MySQL connection pool at startup.
+    Pooling avoids the ~200-300ms TCP handshake on every request to cloud MySQL.
+    """
+    global _mysql_pool, ACTIVE_DB_TYPE, DB_ENGINE
+    if Config.DB_MODE not in ('mysql', 'auto'):
+        return
+    try:
+        _mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
+            pool_name="school_lf_pool",
+            pool_size=5,
+            pool_reset_session=True,
+            host=Config.MYSQL_HOST,
+            user=Config.MYSQL_USER,
+            password=Config.MYSQL_PASSWORD,
+            database=Config.MYSQL_DB,
+            port=Config.MYSQL_PORT,
+            connection_timeout=10,
+            connect_timeout=10,
+        )
+        ACTIVE_DB_TYPE = 'mysql'
+        DB_ENGINE = "MySQL 8.0"
+        print("[DB] MySQL connection pool created (pool_size=5) for {}:{}".format(
+            Config.MYSQL_HOST, Config.MYSQL_PORT))
+    except Exception as e:
+        print("[DB] Pool creation failed: {}. Will retry per-request.".format(e))
+        _mysql_pool = None
 
 def get_db_connection():
     """
-    Establishes and returns a database connection.
-    - Default/CBSE Mode: MySQL 8.0 using mysql.connector
-    - Cloud/Offline Mode: Seamlessly falls back to SQLite if MySQL is offline or in cloud deployment.
+    Returns a database connection from the pool (MySQL) or opens SQLite.
+    - MySQL: pulls from pre-created pool — no TCP overhead per request.
+    - SQLite: fallback for local dev only.
     """
-    global ACTIVE_DB_TYPE, DB_ENGINE
+    global ACTIVE_DB_TYPE, DB_ENGINE, _mysql_pool
 
-    # Explicit SQLite mode
+    # SQLite explicit mode (local dev only)
     if Config.DB_MODE == 'sqlite':
         ACTIVE_DB_TYPE = 'sqlite'
         DB_ENGINE = "MySQL 8.0"
@@ -53,46 +83,38 @@ def get_db_connection():
         conn.row_factory = sqlite3.Row
         return conn
 
-    # Explicit MySQL mode or already determined MySQL
-    if Config.DB_MODE == 'mysql' or (Config.DB_MODE == 'auto' and ACTIVE_DB_TYPE == 'mysql'):
+    # Use connection pool if available
+    if _mysql_pool is not None:
         try:
-            conn = mysql.connector.connect(
-                host=Config.MYSQL_HOST,
-                user=Config.MYSQL_USER,
-                password=Config.MYSQL_PASSWORD,
-                database=Config.MYSQL_DB,
-                port=Config.MYSQL_PORT,
-                connection_timeout=3
-            )
-            ACTIVE_DB_TYPE = 'mysql'
-            DB_ENGINE = "MySQL 8.0"
-            return conn
-        except Exception as e:
-            if Config.DB_MODE == 'mysql':
-                raise e
-            # auto fallback for cloud deployments without local MySQL
-            ACTIVE_DB_TYPE = 'sqlite'
-            DB_ENGINE = "MySQL 8.0"
-
-    # Auto mode first probe
-    if Config.DB_MODE == 'auto':
-        try:
-            conn = mysql.connector.connect(
-                host=Config.MYSQL_HOST,
-                user=Config.MYSQL_USER,
-                password=Config.MYSQL_PASSWORD,
-                database=Config.MYSQL_DB,
-                port=Config.MYSQL_PORT,
-                connection_timeout=2
-            )
+            conn = _mysql_pool.get_connection()
             ACTIVE_DB_TYPE = 'mysql'
             DB_ENGINE = "MySQL 8.0"
             return conn
         except Exception:
-            ACTIVE_DB_TYPE = 'sqlite'
-            DB_ENGINE = "MySQL 8.0"
+            # Pool exhausted or stale — fall through to direct connect
+            pass
 
-    # SQLite fallback
+    # Direct connect fallback (if pool unavailable)
+    try:
+        conn = mysql.connector.connect(
+            host=Config.MYSQL_HOST,
+            user=Config.MYSQL_USER,
+            password=Config.MYSQL_PASSWORD,
+            database=Config.MYSQL_DB,
+            port=Config.MYSQL_PORT,
+            connection_timeout=10,
+        )
+        ACTIVE_DB_TYPE = 'mysql'
+        DB_ENGINE = "MySQL 8.0"
+        return conn
+    except Exception as e:
+        if Config.DB_MODE == 'mysql':
+            raise e
+        # Auto mode: fall back to SQLite
+        ACTIVE_DB_TYPE = 'sqlite'
+        DB_ENGINE = "MySQL 8.0"
+
+    # SQLite fallback (auto mode only)
     if not os.path.exists(Config.SQLITE_PATH):
         init_sqlite_db(Config.SQLITE_PATH)
     conn = sqlite3.connect(Config.SQLITE_PATH)
@@ -1012,6 +1034,11 @@ def internal_server_error(e):
 # ---------------------------------------------------------------------------
 # Application Entry Point
 # ---------------------------------------------------------------------------
+
+# Initialize MySQL connection pool at module load time.
+# This runs once when gunicorn imports the module, so all workers share
+# pre-warmed connections — no TCP handshake delay on first user request.
+_init_connection_pool()
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1')
