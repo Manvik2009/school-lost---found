@@ -5,8 +5,9 @@ This guide provides step-by-step instructions to deploy the **School Lost & Foun
 ---
 
 ## 🌐 Live Deployments
-* **Firebase Hosting (CDN Portal):** [https://school-lost-found-2026.web.app](https://school-lost-found-2026.web.app)
-* **Firebase Console:** [https://console.firebase.google.com/project/school-lost-found-2026/overview](https://console.firebase.google.com/project/school-lost-found-2026/overview)
+* **Dynamic Python Flask App (Render):** [https://school-lost-and-found-vboh.onrender.com](https://school-lost-and-found-vboh.onrender.com)
+* **Firebase CDN Portal:** [https://school-lost-found-2026.web.app](https://school-lost-found-2026.web.app)
+* **GitHub Repository:** [https://github.com/Manvik2009/school-lost---found](https://github.com/Manvik2009/school-lost---found)
 
 ---
 
